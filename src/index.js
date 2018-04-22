@@ -1,5 +1,27 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './App';
+import styled from 'styled-components';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+import App from './App';
+import MainScreen from './MainScreen';
+// import SignUp from './SignUp';
+
+const BothPages = () => (
+  <styles.Layout>
+    <MainScreen />
+    {/* <SignUp /> */}
+    <App />
+  </styles.Layout>
+);
+
+const styles = {
+  Layout: styled.div`
+    width: 1205px;
+    height: 605px;
+
+    display: flex;
+    flex-direction: row;
+  `,
+};
+
+ReactDOM.render(<BothPages />, document.getElementById('root'));
