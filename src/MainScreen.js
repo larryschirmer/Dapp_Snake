@@ -1,13 +1,28 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 
+import { processScores } from './functions';
+import { getScores } from './fetch';
+
 const newHere = `Hey, you're new here. How's about we get you logged in?`;
-const mockName = `creator`;
-const mockAddress = `0x9495BA0b81f92d45C2F4...`;
-const mockScore = `218`;
 
 class MainScreen extends Component {
+  state = {
+    scores: false,
+  };
+
+  componentDidMount() {
+    this.getScores();
+  }
+
+  getScores = async () => {
+    const scores = await getScores();
+    this.setState({ scores });
+  };
+
   render() {
+    const { scores } = this.state;
+
     return (
       <styles.Screen>
         <styles.Title>Dapp Snake!</styles.Title>
@@ -17,16 +32,13 @@ class MainScreen extends Component {
         </styles.ReadyPlayerOne>
         <styles.HighScore>
           <styles.ScoreBoardHeader>Top Scores</styles.ScoreBoardHeader>
-          <styles.Score index={0} border>
-            <div>{mockName}</div>
-            <div>{mockAddress}</div>
-            <div>{mockScore}</div>
-          </styles.Score>
-          <styles.Score index={1}>
-            <div>{mockName}</div>
-            <div>{mockAddress}</div>
-            <div>{mockScore}</div>
-          </styles.Score>
+          {scores ? (
+            processScores(scores)
+          ) : (
+            <styles.ScoresWaiting>
+              Fetching proof of ambitious snake scores...
+            </styles.ScoresWaiting>
+          )}
         </styles.HighScore>
       </styles.Screen>
     );
@@ -87,33 +99,13 @@ const styles = {
     grid-row: 1/2;
     font-size: 24px;
   `,
-  Score: styled.div`
-    grid-column: 1/2;
-    grid-row: ${({ index }) => `${index + 2}/${index + 3}`}
+
+  ScoresWaiting: styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    grid-row: 2/3;
     font-size: 18px;
-
-    display: grid;
-    grid-template-columns: 200px 300px 100px;
-
-    ${({ border }) => (border ? `border-bottom: 1px solid blue` : ``)}
-
-    > div {
-      display: flex;
-      padding-left: 10px;
-      align-items: center;
-    }
-
-    > div:nth-child(1) {
-      grid-column: 1/2;
-    }
-
-    > div:nth-child(2) {
-      grid-column: 2/3;
-    }
-
-    > div:nth-child(3) {
-      grid-column: 3/4;
-    }
   `,
 };
 
