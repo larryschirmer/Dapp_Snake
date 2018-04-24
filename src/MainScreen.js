@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
+import { select } from 'd3-selection';
 import styled from 'styled-components';
 
 import { processScores } from './functions';
 import { getScores } from './fetch';
+import { snake as snakePath } from './snake';
 
 const newHere = `Hey, you're new here. How's about we get you logged in?`;
 
@@ -12,6 +14,20 @@ class MainScreen extends Component {
   };
 
   componentDidMount() {
+    const svg = select(this.node);
+
+    const snakeImg = svg
+      .append('g')
+      .attr('transform', `translate(${-500}, ${-550}) scale(0.60)`);
+
+    snakeImg
+      .append('path')
+      .attr('d', snakePath)
+      .attr('stroke', '#000')
+      .attr('stroke-width', 2)
+      .attr('fill', 'none')
+      .attr('stroke-linecap', 'round');
+
     this.getScores();
   }
 
@@ -26,7 +42,9 @@ class MainScreen extends Component {
     return (
       <styles.Screen>
         <styles.Title>Dapp Snake!</styles.Title>
-        <styles.SplishSplash>Flashy Image Thing</styles.SplishSplash>
+        <styles.SplishSplash>
+          <svg ref={node => (this.node = node)} width={`600px`} height={`200px`} />
+        </styles.SplishSplash>
         <styles.ReadyPlayerOne>
           <div>{newHere}</div>
         </styles.ReadyPlayerOne>
