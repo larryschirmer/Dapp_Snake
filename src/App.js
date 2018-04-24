@@ -74,7 +74,13 @@ class App extends Component {
         <styles.PlayField>
           <canvas ref={x => (this.canvas = x)} />
         </styles.PlayField>
-        {gameover && <styles.GameOver>GameOver</styles.GameOver>}
+        {gameover && (
+          <styles.GameOver>
+            <div>GameOver</div>
+            <div>Pretty Decent Score There</div>
+            <styles.Button>How's about we post that?</styles.Button>
+          </styles.GameOver>
+        )}
       </styles.Game>
     );
   }
@@ -133,6 +139,27 @@ const styles = {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
+
+    > div:nth-child(1) {
+      font-size: 24px;
+      padding-bottom: 5px;
+    }
+
+    > div:nth-child(2) {
+      font-size: 12px;
+      line-height: 14px;
+    }
+  `,
+
+  Button: styled.button`
+    grid-row: 3/4;
+    font-size: 24px;
+    cursor: pointer;
+
+    &:focus {
+      outline: 0;
+    }
   `,
 };
 
