@@ -6,14 +6,32 @@ import App from './App';
 import MainScreen from './MainScreen';
 import SignUp from './SignUp';
 
+import { getPlayerInfo, getAddress } from './fetch';
+
 class BothPages extends Component {
   state = {
     show: [1, 0, 0],
+    persona: false,
   };
+
+  async componentDidMount() {
+    const address = await getAddress();
+    const { persona } = this.state;
+    this.setState({ persona: { ...persona, address } });
+  }
 
   onClick = frame => {
     const newShow = new Array(3).fill().map((_, i) => (i === frame ? 1 : 0));
     this.setState({ show: newShow });
+  };
+
+  updateName = async () => {
+    const { address } = this.state.persona;
+    console.log('fetching new name');
+    const playerInfo = await getPlayerInfo(address);
+    console.log(`found name ${playerInfo}`);
+    const { persona } = this.state;
+    this.setState({ persona: { ...persona, name: playerInfo } });
   };
 
   render() {
@@ -21,10 +39,17 @@ class BothPages extends Component {
       <Fragment>
         <styles.Layout>
           <styles.FrameOne show={this.state.show[0]}>
-            <MainScreen />
+            <MainScreen
+              persona={this.state.persona}
+              onClick={frame => this.onClick(frame)}
+            />
           </styles.FrameOne>
           <styles.FrameTwo show={this.state.show[1]}>
-            <SignUp />
+            <SignUp
+              persona={this.state.persona}
+              cb={this.updateName}
+              changeFrame={frame => this.onClick(frame)}
+            />
           </styles.FrameTwo>
           <styles.FrameThree show={this.state.show[2]}>
             <App />

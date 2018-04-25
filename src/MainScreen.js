@@ -3,7 +3,7 @@ import { select } from 'd3-selection';
 import styled from 'styled-components';
 
 import { processScores } from './functions';
-import { getScores, getPlayerInfo } from './fetch';
+import { getScores } from './fetch';
 import { snake as snakePath } from './snake';
 
 class MainScreen extends Component {
@@ -29,13 +29,20 @@ class MainScreen extends Component {
       .attr('stroke-linecap', 'round');
 
     this.getScores();
-    this.getPlayerInfo();
   }
 
-  getPlayerInfo = async () => {
-    const playerInfo = await getPlayerInfo();
-    this.setState({ persona: playerInfo });
-  };
+  static getDerivedStateFromProps(nextProps, prevState) {
+    console.log('received props', JSON.stringify(nextProps));
+    if (nextProps.persona.name === '')
+      return {
+        ...prevState,
+        persona: { address: nextProps.persona.address },
+      };
+
+    const persona = { name: nextProps.persona.name, address: nextProps.persona.address };
+
+    return { ...prevState, persona };
+  }
 
   getScores = async () => {
     const scores = await getScores();
@@ -44,10 +51,12 @@ class MainScreen extends Component {
 
   onPlay = () => {
     console.log('you clicked play');
+    this.props.onClick(2);
   };
 
   onSignin = () => {
     console.log('you clicked Signin');
+    this.props.onClick(1);
   };
 
   Persona = ({ data: { name } }) => (

@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-// 'project-name-generator'
-// https://endpoints.uncaughtexception.wtf/d25b03c1af5646e89f68bc711487d3d8/view
+import generate from 'project-name-generator';
+
+import { setName } from './fetch';
 
 const finePrint = `Totally optional. But, I mean this is a real opportunity to choose a name that defines who you aspire to be. Or you could choose an ironic name like Indiana Jones. Just saying… Also, if you choose to not have a "Gamer Handle", then this app will give you a random name which, roll the dice, could be cool, but you might end up with a hopelessly boring name like Dapp Snake.`;
 
@@ -29,8 +30,18 @@ class SignUp extends Component {
     this.setState({ [name]: processGamerHandle(value) });
   };
 
-  onSaveName = () => {
+  onSaveName = async () => {
+    this.props.changeFrame(0);
+    const { address } = this.props.persona;
+    const { gamerName } = this.state;
+
+    let nameToSave = gamerName;
+    if (gamerName === '') nameToSave = generate({ words: 2 }).dashed;
+
     console.log('user saves a great name');
+    await setName(address, nameToSave);
+    console.log('saved new name');
+    this.props.cb();
   };
 
   render() {
