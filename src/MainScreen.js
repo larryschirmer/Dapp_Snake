@@ -1,16 +1,16 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { select } from 'd3-selection';
 import styled from 'styled-components';
 
 import { processScores } from './functions';
-import { getScores } from './fetch';
+import { getScores, getPlayerInfo } from './fetch';
 import { snake as snakePath } from './snake';
-
-const newHere = `Hey, you're new here. How's about we get you logged in?`;
 
 class MainScreen extends Component {
   state = {
     scores: false,
+    persona: false,
+    buttonActive: false,
   };
 
   componentDidMount() {
@@ -29,15 +29,58 @@ class MainScreen extends Component {
       .attr('stroke-linecap', 'round');
 
     this.getScores();
+    this.getPlayerInfo();
   }
+
+  getPlayerInfo = async () => {
+    const playerInfo = await getPlayerInfo();
+    this.setState({ persona: playerInfo });
+  };
 
   getScores = async () => {
     const scores = await getScores();
     this.setState({ scores });
   };
 
+  onPlay = () => {
+    console.log('you clicked play');
+  };
+
+  onSignin = () => {
+    console.log('you clicked Signin');
+  };
+
+  Persona = ({ data: { name } }) => (
+    <Fragment>
+      {name ? (
+        <styles.WelcomeBackMessage>
+          <div>Welcome Back, {name}</div>
+          <styles.Button
+            onMouseOver={() => this.setState({ buttonActive: true })}
+            onMouseOut={() => this.setState({ buttonActive: false })}
+            onClick={this.onPlay}>
+            Play
+            {this.state.buttonActive && <styles.ButtonUnderline width={37} />}
+          </styles.Button>
+        </styles.WelcomeBackMessage>
+      ) : (
+        <this.NewHere />
+      )}
+    </Fragment>
+  );
+
+  NewHere = () => (
+    <styles.Button
+      onMouseOver={() => this.setState({ buttonActive: true })}
+      onMouseOut={() => this.setState({ buttonActive: false })}
+      onClick={this.onSignin}>
+      Hey, you're new here. How's about we get you logged in?
+      {this.state.buttonActive && <styles.ButtonUnderline width={486} />}
+    </styles.Button>
+  );
+
   render() {
-    const { scores } = this.state;
+    const { scores, persona } = this.state;
 
     return (
       <styles.Screen>
@@ -46,7 +89,11 @@ class MainScreen extends Component {
           <svg ref={node => (this.node = node)} width={`600px`} height={`200px`} />
         </styles.SplishSplash>
         <styles.ReadyPlayerOne>
-          <div>{newHere}</div>
+          {persona ? (
+            <this.Persona data={persona} />
+          ) : (
+            'Tipping the scales in your favor...'
+          )}
         </styles.ReadyPlayerOne>
         <styles.HighScore>
           <styles.ScoreBoardHeader>Top Scores</styles.ScoreBoardHeader>
@@ -79,7 +126,6 @@ const styles = {
     justify-content: center;
     align-items: center;
     font-size: 36px;
-    border: 1px solid black;
     grid-row: 1/2;
   `,
 
@@ -88,7 +134,6 @@ const styles = {
     justify-content: center;
     align-items: center;
     font-size: 36px;
-    border: 1px solid black;
     grid-row: 2/3;
   `,
 
@@ -97,8 +142,16 @@ const styles = {
     justify-content: center;
     align-items: center;
     font-size: 24px;
-    border: 1px solid black;
     grid-row: 3/4;
+  `,
+
+  WelcomeBackMessage: styled.div`
+    display: flex;
+    flex-direction: row;
+
+    > div:nth-child(2) {
+      margin-left: 125px;
+    }
   `,
 
   HighScore: styled.div`
@@ -124,6 +177,22 @@ const styles = {
     align-items: center;
     grid-row: 2/3;
     font-size: 18px;
+  `,
+
+  Button: styled.div`
+    position: relative
+    cursor: pointer;
+    font-size: 21px;
+  `,
+
+  ButtonUnderline: styled.div`
+    position: absolute;
+
+    top: 23px;
+    width: ${({ width }) => width}px;
+    height: 2px;
+    background: #000;
+    z-index: 10;
   `,
 };
 

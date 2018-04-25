@@ -9,7 +9,7 @@ export default scores => {
   for (let score in scores) {
     highScores = [
       ...highScores,
-      <styles.Score index={score}>
+      <styles.Score key={scores[score].address} index={score}>
         <div>{scores[score].name}</div>
         <div>{trimAddress(scores[score].address)}</div>
         <div>{scores[score].score}</div>

@@ -4,19 +4,19 @@ import styled from 'styled-components';
 
 import App from './App';
 import MainScreen from './MainScreen';
-// import SignUp from './SignUp';
+import SignUp from './SignUp';
 
 const BothPages = () => (
   <styles.Layout>
     <MainScreen />
-    {/* <SignUp /> */}
+    <SignUp />
     <App />
   </styles.Layout>
 );
 
 const styles = {
   Layout: styled.div`
-    width: 1205px;
+    width: 1805px;
     height: 605px;
 
     display: flex;

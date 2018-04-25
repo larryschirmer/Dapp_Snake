@@ -39,6 +39,8 @@ class App extends Component {
     score: 0,
     distraction: foodLines[0],
     gameover: false,
+    buttonActivePost: false,
+    buttonActiveReturn: false,
   };
 
   componentDidMount() {
@@ -63,6 +65,14 @@ class App extends Component {
     });
   }
 
+  onPostScore = () => {
+    console.log('user posted score');
+  };
+
+  onGoBack = () => {
+    console.log('user wants to go back');
+  };
+
   render() {
     const { score, distraction, gameover } = this.state;
     return (
@@ -77,8 +87,20 @@ class App extends Component {
         {gameover && (
           <styles.GameOver>
             <div>GameOver</div>
-            <div>Pretty Decent Score There</div>
-            <styles.Button>How's about we post that?</styles.Button>
+            <styles.Button
+              onMouseOver={() => this.setState({ buttonActivePost: true })}
+              onMouseOut={() => this.setState({ buttonActivePost: false })}
+              onClick={this.onPostScore}>
+              How's about we post that?
+              {this.state.buttonActivePost && <styles.ButtonUnderline width={222} />}
+            </styles.Button>
+            <styles.Button
+              onMouseOver={() => this.setState({ buttonActiveReturn: true })}
+              onMouseOut={() => this.setState({ buttonActiveReturn: false })}
+              onClick={this.onGoBack}>
+              Nah, I'll go back
+              {this.state.buttonActiveReturn && <styles.ButtonUnderline width={141} />}
+            </styles.Button>
           </styles.GameOver>
         )}
       </styles.Game>
@@ -145,21 +167,22 @@ const styles = {
       font-size: 24px;
       padding-bottom: 5px;
     }
-
-    > div:nth-child(2) {
-      font-size: 12px;
-      line-height: 14px;
-    }
   `,
 
-  Button: styled.button`
-    grid-row: 3/4;
-    font-size: 24px;
+  Button: styled.div`
+    position: relative
     cursor: pointer;
+    font-size: 21px;
+  `,
 
-    &:focus {
-      outline: 0;
-    }
+  ButtonUnderline: styled.div`
+    position: absolute;
+
+    top: 23px;
+    width: ${({ width }) => width}px;
+    height: 2px;
+    background: #000;
+    z-index: 10;
   `,
 };
 

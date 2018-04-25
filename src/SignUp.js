@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
+// 'project-name-generator'
+// https://endpoints.uncaughtexception.wtf/d25b03c1af5646e89f68bc711487d3d8/view
 
 const finePrint = `Totally optional. But, I mean this is a real opportunity to choose a name that defines who you aspire to be. Or you could choose an ironic name like Indiana Jones. Just saying… Also, if you choose to not have a "Gamer Handle", then this app will give you a random name which, roll the dice, could be cool, but you might end up with a hopelessly boring name like Dapp Snake.`;
 
@@ -20,10 +22,15 @@ const processGamerHandle = handle => {
 class SignUp extends Component {
   state = {
     gamerName: '',
+    buttonActive: false,
   };
 
   onChange = ({ target: { name, value } }) => {
     this.setState({ [name]: processGamerHandle(value) });
+  };
+
+  onSaveName = () => {
+    console.log('user saves a great name');
   };
 
   render() {
@@ -38,7 +45,13 @@ class SignUp extends Component {
           <div>Fine Print:</div>
           <div>{finePrint}</div>
         </styles.FinePrint>
-        <styles.Button>Commitment</styles.Button>
+        <styles.Button
+          onMouseOver={() => this.setState({ buttonActive: true })}
+          onMouseOut={() => this.setState({ buttonActive: false })}
+          onClick={this.onSaveName}>
+          Commitment
+          {this.state.buttonActive && <styles.ButtonUnderline width={111} />}
+        </styles.Button>
       </styles.Screen>
     );
   }
@@ -73,7 +86,7 @@ const styles = {
 
     border: 1px solid black;
     border-radius: 5px;
-    margin: 70px 36px 70px 168px;
+    margin: 70px 36px 70px 178px;
     font-size: 24px;
     text-align: center;
   `,
@@ -97,14 +110,23 @@ const styles = {
     }
   `,
 
-  Button: styled.button`
-    grid-row: 3/4;
-    font-size: 24px;
+  Button: styled.div`
+  grid-row: 3/4;
+    position: relative
     cursor: pointer;
+    font-size: 21px;
+    display: flex;
+    justify-content: center;
+  `,
 
-    &:focus {
-      outline: 0;
-    }
+  ButtonUnderline: styled.div`
+    position: absolute;
+
+    top: 23px;
+    width: ${({ width }) => width}px;
+    height: 2px;
+    background: #000;
+    z-index: 10;
   `,
 };
 
