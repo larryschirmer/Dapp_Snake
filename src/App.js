@@ -110,7 +110,6 @@ class App extends Component {
 
 const styles = {
   Game: styled.div`
-    border: 1px dotted #101010;
     width: 600px;
     height: 600px;
     display: grid;

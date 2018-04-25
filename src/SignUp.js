@@ -59,7 +59,6 @@ class SignUp extends Component {
 
 const styles = {
   Screen: styled.div`
-    border: 1px dotted #101010;
     width: 600px;
     height: 600px;
 
