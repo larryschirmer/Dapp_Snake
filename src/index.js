@@ -41,7 +41,7 @@ class BothPages extends Component {
           <styles.FrameOne show={this.state.show[0]}>
             <MainScreen
               persona={this.state.persona}
-              onClick={frame => this.onClick(frame)}
+              changeFrame={frame => this.onClick(frame)}
             />
           </styles.FrameOne>
           <styles.FrameTwo show={this.state.show[1]}>
@@ -52,7 +52,10 @@ class BothPages extends Component {
             />
           </styles.FrameTwo>
           <styles.FrameThree show={this.state.show[2]}>
-            <App />
+            <App
+              persona={this.state.persona}
+              changeFrame={frame => this.onClick(frame)}
+            />
           </styles.FrameThree>
         </styles.Layout>
         <div onClick={() => this.onClick(0)}>Hey 0</div>

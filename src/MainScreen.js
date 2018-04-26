@@ -51,12 +51,12 @@ class MainScreen extends Component {
 
   onPlay = () => {
     console.log('you clicked play');
-    this.props.onClick(2);
+    this.props.changeFrame(2);
   };
 
   onSignin = () => {
     console.log('you clicked Signin');
-    this.props.onClick(1);
+    this.props.changeFrame(1);
   };
 
   Persona = ({ data: { name } }) => (

@@ -38,32 +38,42 @@ class App extends Component {
   state = {
     score: 0,
     distraction: foodLines[0],
+    ready: false,
     gameover: false,
     buttonActivePost: false,
     buttonActiveReturn: false,
+    game: null,
+    gameId: null,
   };
 
-  componentDidMount() {
+  startGame = () => {
     const { canvas } = this;
     const ctx = initializeCanvas(canvas);
     const game = new Game({ size: SIZE, grid_size: GRID_SIZE, ctx });
 
-    const gameId = setInterval(() => game.tick(newDirection), 100); // Kick off the game loop!
     window.onkeydown = e => {
       newDirection = { 37: -1, 38: -2, 39: 1, 40: 2 }[e.keyCode] || newDirection;
     };
-
-    game.on('gameover', () => {
-      console.log('game over it says');
-      this.setState({ gameover: true });
-      clearInterval(gameId);
-    });
 
     game.on('score-update', ({ score }) => {
       const distraction = foodLines[getNumber()];
       this.setState({ score, distraction });
     });
-  }
+
+    game.on('gameover', this.stopGame);
+
+    this.setState({ game });
+
+    const gameId = setInterval(() => game.tick(newDirection), 100);
+    this.setState({ gameId, ready: true });
+  };
+
+  stopGame = () => {
+    const { gameId } = this.state;
+    console.log('game over it says');
+    clearInterval(gameId);
+    this.setState({ gameover: true, gameId: null, game: null });
+  };
 
   onPostScore = () => {
     console.log('user posted score');
@@ -71,10 +81,12 @@ class App extends Component {
 
   onGoBack = () => {
     console.log('user wants to go back');
+    this.props.changeFrame(0);
+    this.setState({ gameover: false, ready: false });
   };
 
   render() {
-    const { score, distraction, gameover } = this.state;
+    const { score, distraction, gameover, ready } = this.state;
     return (
       <styles.Game>
         <styles.Header>
@@ -85,14 +97,14 @@ class App extends Component {
           <canvas ref={x => (this.canvas = x)} />
         </styles.PlayField>
         {gameover && (
-          <styles.GameOver>
+          <styles.DisplayWindow>
             <div>GameOver</div>
             <styles.Button
               onMouseOver={() => this.setState({ buttonActivePost: true })}
               onMouseOut={() => this.setState({ buttonActivePost: false })}
               onClick={this.onPostScore}>
-              How's about we post that?
-              {this.state.buttonActivePost && <styles.ButtonUnderline width={222} />}
+              How's about we post that score?
+              {this.state.buttonActivePost && <styles.ButtonUnderline width={270} />}
             </styles.Button>
             <styles.Button
               onMouseOver={() => this.setState({ buttonActiveReturn: true })}
@@ -101,7 +113,19 @@ class App extends Component {
               Nah, I'll go back
               {this.state.buttonActiveReturn && <styles.ButtonUnderline width={141} />}
             </styles.Button>
-          </styles.GameOver>
+          </styles.DisplayWindow>
+        )}
+        {!ready && (
+          <styles.DisplayWindow>
+            <div>Ready?</div>
+            <styles.Button
+              onMouseOver={() => this.setState({ buttonActivePost: true })}
+              onMouseOut={() => this.setState({ buttonActivePost: false })}
+              onClick={this.startGame}>
+              Start Game
+              {this.state.buttonActivePost && <styles.ButtonUnderline width={97} />}
+            </styles.Button>
+          </styles.DisplayWindow>
         )}
       </styles.Game>
     );
@@ -148,7 +172,7 @@ const styles = {
     justify-content: center;
   `,
 
-  GameOver: styled.div`
+  DisplayWindow: styled.div`
     width: 300px;
     height: 150px;
     border: 1px solid black;
