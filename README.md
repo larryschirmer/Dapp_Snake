@@ -152,3 +152,11 @@ So Sorry
 
 3.  Dry up state by moving everything into a single redux store
 4.  Remove the need to have to send the user's address to the contract methed on each request
+
+# See other great repositories
+
+These three repositories were helpful in creating this project, thanks
+
+* [Jordan Eldredge - Game Logic](https://github.com/captbaritone/snake.js)
+* [Steven Gridder - Dapp Templates](https://github.com/StephenGrider/EthereumCasts)
+* [Siraj Raval - Your_First_Decentralized_Application](https://github.com/llSourcell/Your_First_Decentralized_Application)
