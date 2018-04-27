@@ -11,8 +11,8 @@ if (typeof window !== 'undefined' && typeof window.web3 !== 'undefined') {
   web3Error = true;
 }
 
-export default async () => {
-  if (web3Error) return {};
+export default async score => {
+  if (web3Error) return;
 
   const contract = await new web3.eth.Contract(
     JSON.parse(config.contractInterface),
@@ -21,9 +21,7 @@ export default async () => {
 
   const [playerAddress] = await web3.eth.getAccounts();
 
-  //Get name
-  const playerName = await contract.methods.getName(playerAddress).call();
-
-  if (playerName === '') return {};
-  return { name: playerName };
+  await contract.methods
+    .setScore(playerAddress, score)
+    .send({ from: playerAddress, gas: '1000000' });
 };

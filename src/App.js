@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import Game from './Game';
+import { setScore } from './fetch';
 
 const foodLines = [
   'Is butter a carb?',
@@ -70,19 +71,19 @@ class App extends Component {
 
   stopGame = () => {
     const { gameId } = this.state;
-    console.log('game over it says');
     clearInterval(gameId);
     this.setState({ gameover: true, gameId: null, game: null });
   };
 
-  onPostScore = () => {
-    console.log('user posted score');
+  onPostScore = async () => {
+    this.props.changeFrame(0);
+    this.setState({ gameover: false, ready: false, score: 0 });
+    setScore(this.state.score);
   };
 
   onGoBack = () => {
-    console.log('user wants to go back');
     this.props.changeFrame(0);
-    this.setState({ gameover: false, ready: false });
+    this.setState({ gameover: false, ready: false, score: 0 });
   };
 
   render() {

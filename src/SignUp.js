@@ -32,15 +32,12 @@ class SignUp extends Component {
 
   onSaveName = async () => {
     this.props.changeFrame(0);
-    const { address } = this.props.persona;
     const { gamerName } = this.state;
 
     let nameToSave = gamerName;
     if (gamerName === '') nameToSave = generate({ words: 2 }).dashed;
 
-    console.log('user saves a great name');
-    await setName(address, nameToSave);
-    console.log('saved new name');
+    await setName(nameToSave);
     this.props.cb();
   };
 

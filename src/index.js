@@ -6,7 +6,7 @@ import App from './App';
 import MainScreen from './MainScreen';
 import SignUp from './SignUp';
 
-import { getPlayerInfo, getAddress } from './fetch';
+import { getPlayerInfo } from './fetch';
 
 class BothPages extends Component {
   state = {
@@ -15,9 +15,8 @@ class BothPages extends Component {
   };
 
   async componentDidMount() {
-    const address = await getAddress();
-    const { persona } = this.state;
-    this.setState({ persona: { ...persona, address } });
+    const persona = await getPlayerInfo();
+    this.setState({ persona });
   }
 
   onClick = frame => {
@@ -26,12 +25,8 @@ class BothPages extends Component {
   };
 
   updateName = async () => {
-    const { address } = this.state.persona;
-    console.log('fetching new name');
-    const playerInfo = await getPlayerInfo(address);
-    console.log(`found name ${playerInfo}`);
-    const { persona } = this.state;
-    this.setState({ persona: { ...persona, name: playerInfo } });
+    const persona = await getPlayerInfo();
+    this.setState({ persona });
   };
 
   render() {
@@ -52,15 +47,9 @@ class BothPages extends Component {
             />
           </styles.FrameTwo>
           <styles.FrameThree show={this.state.show[2]}>
-            <App
-              persona={this.state.persona}
-              changeFrame={frame => this.onClick(frame)}
-            />
+            <App changeFrame={frame => this.onClick(frame)} />
           </styles.FrameThree>
         </styles.Layout>
-        <div onClick={() => this.onClick(0)}>Hey 0</div>
-        <div onClick={() => this.onClick(1)}>Hey 1</div>
-        <div onClick={() => this.onClick(2)}>Hey 2</div>
       </Fragment>
     );
   }

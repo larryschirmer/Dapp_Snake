@@ -32,7 +32,6 @@ class MainScreen extends Component {
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
-    console.log('received props', JSON.stringify(nextProps));
     if (nextProps.persona.name === '')
       return {
         ...prevState,
@@ -50,12 +49,10 @@ class MainScreen extends Component {
   };
 
   onPlay = () => {
-    console.log('you clicked play');
     this.props.changeFrame(2);
   };
 
   onSignin = () => {
-    console.log('you clicked Signin');
     this.props.changeFrame(1);
   };
 
