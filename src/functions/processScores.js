@@ -3,22 +3,14 @@ import styled from 'styled-components';
 
 import { trimAddress } from '../functions';
 
-export default scores => {
-  let highScores = [];
-
-  for (let score in scores) {
-    highScores = [
-      ...highScores,
-      <styles.Score key={scores[score].address} index={score}>
-        <div>{scores[score].name}</div>
-        <div>{trimAddress(scores[score].address)}</div>
-        <div>{scores[score].score}</div>
-      </styles.Score>,
-    ];
-  }
-
-  return highScores;
-};
+export default scores =>
+  scores.map((score, index) => (
+    <styles.Score key={`${score.address}-${index}`} index={index}>
+      <div>{score.name}</div>
+      <div>{trimAddress(score.address)}</div>
+      <div>{score.score}</div>
+    </styles.Score>
+  ));
 
 const styles = {
   Score: styled.div`

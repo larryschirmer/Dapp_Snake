@@ -1,24 +1,66 @@
-const wait = ms => new Promise(res => setTimeout(res, ms));
+import Web3 from 'web3';
+import config from '../contractConfig.json';
 
-const scores = {
-  0: {
-    name: 'creator',
-    address: '0x9495BA0b81f92d45C2F4cE2d4d2209e6ebdE787A',
-    score: '405',
-  },
-  2: {
-    name: 'crabby-quicksand',
-    address: '0x5A477851B95d4F0CB9Bde13CD73608759A5e30E0',
-    score: '102',
-  },
-  1: {
-    name: 'grandiose-clam',
-    address: '0x5Cd8Bb7a42ac10729bc87afd608b81FBE7F10337',
-    score: '207',
-  },
-};
+let web3;
+let web3Error = false;
+
+if (typeof window !== 'undefined' && typeof window.web3 !== 'undefined') {
+  // We are in the browser and metamask is running.
+  web3 = new Web3(window.web3.currentProvider);
+} else {
+  web3Error = true;
+}
 
 export default async () => {
-  await wait(2000);
-  return scores;
+  if (web3Error)
+    return [
+      {
+        name: '...',
+        address: 'enable metamask for Rinkeby',
+        score: '...',
+      },
+    ];
+
+  const contract = await new web3.eth.Contract(
+    JSON.parse(config.contractInterface),
+    config.contractAddress,
+  );
+
+  //Get scores
+  const scores = await contract.methods.scores().call();
+
+  // Sort scores highest first
+  const tokenizedScores = scores.map((score, index) => {
+    return {
+      index,
+      score,
+    };
+  });
+
+  const sortedScores = tokenizedScores.sort((a, b) => b.score - a.score);
+
+  // Get additional info for highest three scores only
+  const score0 = await contract.methods.scoresComplete(sortedScores[0].index).call();
+  const score1 = await contract.methods.scoresComplete(sortedScores[1].index).call();
+  const score2 = await contract.methods.scoresComplete(sortedScores[2].index).call();
+
+  const highScores = [
+    {
+      name: score0.name,
+      address: score0.playerAddress,
+      score: score0.score,
+    },
+    {
+      name: score1.name,
+      address: score1.playerAddress,
+      score: score1.score,
+    },
+    {
+      name: score2.name,
+      address: score2.playerAddress,
+      score: score2.score,
+    },
+  ];
+
+  return highScores;
 };
