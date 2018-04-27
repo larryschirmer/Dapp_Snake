@@ -12,11 +12,20 @@ Donate! If you want to... (eth) `0x9495BA0b81f92d45C2F4cE2d4d2209e6ebdE787A`
 
 ## The Main Screen
 
+![The Main Screen](https://raw.githubusercontent.com/larryschirmer/Dapp_Snake/master/repo_assets/Main%20Screen.png)
+
 ## Signin
+
+![Signin](https://raw.githubusercontent.com/larryschirmer/Dapp_Snake/master/repo_assets/Signin.png)
 
 ## Play
 
+![Play 1](https://raw.githubusercontent.com/larryschirmer/Dapp_Snake/master/repo_assets/Play%201.png)
+![Play 2](https://raw.githubusercontent.com/larryschirmer/Dapp_Snake/master/repo_assets/Play%202.png)
+
 ## Submiting your score
+
+![Submitting your score](https://raw.githubusercontent.com/larryschirmer/Dapp_Snake/master/repo_assets/Submit%20Your%20Score.png)
 
 ## Deploy Your Own
 
@@ -29,7 +38,7 @@ Donate! If you want to... (eth) `0x9495BA0b81f92d45C2F4cE2d4d2209e6ebdE787A`
 `yarn install`
 
 **Notes**
-This project was built with yarn `1.6.0`, npm `6.0.0`, and node.js `10.0.0`. Web3 and the other projects for which this app depend are still in beta so they ~~might~~ give trouble. I also didn't have much luck installing with npm so maybe install with yarn.
+This project was built with yarn `1.6.0`, npm `6.0.0`, and node.js `10.0.0`. Web3 and the other projects for which this app depend are still in beta so they _might_ give trouble. I also didn't have much luck installing with npm so maybe install with yarn.
 
 ### Add config file
 
