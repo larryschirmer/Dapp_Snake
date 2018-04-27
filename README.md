@@ -70,9 +70,9 @@ This project was built with yarn `1.6.0`, npm `6.0.0`, and node.js `10.0.0`. Web
 }
 ```
 
-[How to install metamask and get twelve word phrase](https://medium.com/@followcoin/how-to-install-metamask-88cbdabc1d28)
-[How to get an infura provider url](https://blog.infura.io/getting-started-with-infura-28e41844cc89)
-**Getting a contract address is coming up, see below**
+* [How to install metamask and get twelve word phrase](https://medium.com/@followcoin/how-to-install-metamask-88cbdabc1d28)
+* [How to get an infura provider url](https://blog.infura.io/getting-started-with-infura-28e41844cc89)
+* **Getting a contract address is coming up, see below**
 
 #### Test that everything is running well
 
