@@ -11,22 +11,19 @@ contract SnakeDappDB {
     }
     Score[] public scoresComplete;
     uint[] public scores;
-
-    function setName(string playerName) public {
-        address playerAddress = msg.sender;
+    
+    function setName(address playerAddress, string playerName) public {
         require(playerAddresses[playerAddress] == false);
         
         playerAddresses[playerAddress] = true;
         playerNames[playerAddress] = playerName;
     }
     
-    function getName() public view returns (string) {
-        address playerAddress = msg.sender;
+    function getName(address playerAddress) public view returns (string) {
         return playerNames[playerAddress];
     }
     
-    function setScore(uint score) public {
-        address playerAddress = msg.sender;
+    function setScore(address playerAddress, uint score) public {
         require(playerAddresses[playerAddress] == true);
         
         Score memory newScore = Score({

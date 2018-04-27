@@ -21,12 +21,13 @@ describe('Contract', async () => {
   });
 
   it('sets a name for a senders address', async () => {
+    const playerAddress = accounts[0];
     const playerName = 'sir hiss';
     await contract.methods
-      .setName(playerName)
-      .send({ from: accounts[0], gas: '1000000' });
+      .setName(playerAddress, playerName)
+      .send({ from: playerAddress, gas: '1000000' });
 
-    const setName = await contract.methods.getName().call();
+    const setName = await contract.methods.getName(playerAddress).call();
 
     assert.equal(setName, playerName);
   });
@@ -47,20 +48,20 @@ describe('Contract', async () => {
 
     //Register player names
     await contract.methods
-      .setName(playerName0.name)
+      .setName(playerName0.address, playerName0.name)
       .send({ from: playerName0.address, gas: '1000000' });
 
     await contract.methods
-      .setName(playerName1.name)
+      .setName(playerName1.address, playerName1.name)
       .send({ from: playerName1.address, gas: '1000000' });
 
     //Set each player's high score
     await contract.methods
-      .setScore(playerName0.score)
+      .setScore(playerName0.address, playerName0.score)
       .send({ from: playerName0.address, gas: '1000000' });
 
     await contract.methods
-      .setScore(playerName1.score)
+      .setScore(playerName1.address, playerName1.score)
       .send({ from: playerName1.address, gas: '1000000' });
 
     //Get scores
@@ -85,32 +86,32 @@ describe('Contract', async () => {
 
     //Register player names
     await contract.methods
-      .setName(playerName0.name)
+      .setName(playerName0.address, playerName0.name)
       .send({ from: playerName0.address, gas: '1000000' });
 
     await contract.methods
-      .setName(playerName1.name)
+      .setName(playerName1.address, playerName1.name)
       .send({ from: playerName1.address, gas: '1000000' });
 
     //Set each player's high score
     await contract.methods
-      .setScore(playerName0.score[0])
+      .setScore(playerName0.address, playerName0.score[0])
       .send({ from: playerName0.address, gas: '1000000' });
 
     await contract.methods
-      .setScore(playerName1.score[0])
+      .setScore(playerName1.address, playerName1.score[0])
       .send({ from: playerName1.address, gas: '1000000' });
 
     await contract.methods
-      .setScore(playerName0.score[1])
+      .setScore(playerName0.address, playerName0.score[1])
       .send({ from: playerName0.address, gas: '1000000' });
 
     await contract.methods
-      .setScore(playerName0.score[2])
+      .setScore(playerName0.address, playerName0.score[2])
       .send({ from: playerName0.address, gas: '1000000' });
 
     await contract.methods
-      .setScore(playerName1.score[1])
+      .setScore(playerName1.address, playerName1.score[1])
       .send({ from: playerName1.address, gas: '1000000' });
 
     //Get scores
@@ -176,7 +177,6 @@ describe('Contract', async () => {
       },
     ];
 
-    console.log(JSON.stringify(highScores, null, 2));
     assert.deepEqual(expectedHighScores, highScores);
   });
 });
