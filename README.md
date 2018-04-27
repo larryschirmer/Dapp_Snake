@@ -6,7 +6,7 @@ Donate! If you want to... (eth) `0x9495BA0b81f92d45C2F4cE2d4d2209e6ebdE787A`
 
 # How to play
 
-[Rinkeby Network Demo](https://ipfs.io/ipfs/QmT7TMLfZs3A3TtTQsqxJHtoFzp9yxrHBj4wMpbPpUEbYs) - Make sure to have [Metamask](https://medium.com/@followcoin/how-to-install-metamask-88cbdabc1d28) installed and connected the the Rinkeby Network
+[Rinkeby Network Demo](https://ipfs.io/ipfs/QmT7TMLfZs3A3TtTQsqxJHtoFzp9yxrHBj4wMpbPpUEbYs) - Make sure to have [Metamask](https://medium.com/@followcoin/how-to-install-metamask-88cbdabc1d28) installed and connected the Rinkeby Network
 
 #### App deployed on [IPFS](https://ipfs.io/) and Ethereum Rinkeby
 
