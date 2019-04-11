@@ -1,182 +1,190 @@
 const assert = require('assert');
-const ganache = require('ganache-cli');
 const Web3 = require('web3');
-const web3 = new Web3(ganache.provider());
+const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
 
 const compiled = require('../build/SnakeDappDB.json');
 
-let accounts, contract;
+const encode = string => {
+  let number = '';
+
+  string.split('').forEach((_, i) => {
+    const charCode = string.charCodeAt(i) - 32;
+
+    number += charCode;
+  });
+
+  return +number;
+};
+
+const decode = number => {
+  if (!+number) return '';
+
+  let numArr = number.toString().split('');
+  let chars = [];
+
+  while (numArr.length > 0)
+    chars = [...chars, +numArr.splice(0, 2).reduce((acc, num) => acc + num, '')];
+
+  return chars
+    .map(charCode => String.fromCharCode(charCode + 32))
+    .reduce((str, char) => str + char, '');
+};
+
+const getScoresList = async instance => {
+  // Get scores
+  let names = await instance.methods.getPlayerNames().call();
+  names = names.split(',').map(numName => decode(numName));
+
+  // Get addresses
+  let addresses = await instance.methods.getPlayerAddresses().call();
+  addresses = addresses.split(',');
+
+  // Get scores
+  let scores = await instance.methods.getPlayerScores().call();
+  scores = scores.split(',');
+
+  return [...new Array(3).fill()].map((_, i) => ({
+    name: names[i],
+    address: addresses[i],
+    score: scores[i],
+  }));
+};
+
+let account1, account2, DappSnake, DappSnakeInstance, gasPrice, gas;
 
 beforeEach(async () => {
-  accounts = await web3.eth.getAccounts();
+  [account1, account2] = await web3.eth.getAccounts();
 
-  contract = await new web3.eth.Contract(JSON.parse(compiled.interface))
-    .deploy({ data: compiled.bytecode })
-    .send({ from: accounts[0], gas: '1000000' });
+  DappSnake = new web3.eth.Contract(compiled.interface, null, {
+    data: compiled.bytecode,
+  });
+
+  await web3.eth
+    .getGasPrice()
+    .then(averageGasPrice => (gasPrice = Math.floor(averageGasPrice)))
+    .catch(console.error);
+
+  await DappSnake.deploy()
+    .estimateGas()
+    .then(estimatedGas => (gas = Math.floor(estimatedGas * 1.2)))
+    .catch(console.error);
+
+  await DappSnake.deploy()
+    .send({ from: account1, gasPrice, gas })
+    .then(instance => (DappSnakeInstance = instance));
 });
 
 describe('Contract', async () => {
   it('deploys a contract', async () => {
-    assert.ok(contract.options.address);
+    assert.ok(DappSnakeInstance.options.address);
   });
 
   it('sets a name for a senders address', async () => {
-    const playerAddress = accounts[0];
-    const playerName = 'sir hiss';
-    await contract.methods
-      .setName(playerAddress, playerName)
-      .send({ from: playerAddress, gas: '1000000' });
+    const playerAddress = account1;
+    const playerName = 'sir_hiss';
+    const playerInfo = [account1, encode(playerName)];
 
-    const setName = await contract.methods.getName(playerAddress).call();
+    await DappSnakeInstance.methods.setName(...playerInfo).send({ from: playerAddress, gas });
 
-    assert.equal(setName, playerName);
+    const setName = await DappSnakeInstance.methods.getName(playerAddress).call();
+
+    assert.equal(decode(setName), playerName);
   });
 
-  it('returns scores from two players', async () => {
+  it('returns a score from a player', async () => {
     // Configure Players
-    const playerName0 = {
-      name: 'sir hiss',
-      address: accounts[0],
+    const playerInfo = {
+      name: 'sir_hiss',
+      address: account1,
       score: 123,
     };
-
-    const playerName1 = {
-      name: 'kaa',
-      address: accounts[1],
-      score: 456,
+    const emptyPlayer = {
+      name: '',
+      address: '0x0000000000000000000000000000000000000000',
+      score: '0',
     };
-
-    //Register player names
-    await contract.methods
-      .setName(playerName0.address, playerName0.name)
-      .send({ from: playerName0.address, gas: '1000000' });
-
-    await contract.methods
-      .setName(playerName1.address, playerName1.name)
-      .send({ from: playerName1.address, gas: '1000000' });
-
+    //Register player name
+    await DappSnakeInstance.methods
+      .setName(playerInfo.address, encode(playerInfo.name))
+      .send({ from: playerInfo.address, gas });
     //Set each player's high score
-    await contract.methods
-      .setScore(playerName0.address, playerName0.score)
-      .send({ from: playerName0.address, gas: '1000000' });
-
-    await contract.methods
-      .setScore(playerName1.address, playerName1.score)
-      .send({ from: playerName1.address, gas: '1000000' });
-
+    await DappSnakeInstance.methods
+      .setScore(playerInfo.address, playerInfo.score)
+      .send({ from: playerInfo.address, gas });
     //Get scores
-    const scores = await contract.methods.scores().call();
+    const scoresList = await getScoresList(DappSnakeInstance);
 
-    assert.deepEqual([playerName0.score, playerName1.score], scores);
+    assert.deepEqual([playerInfo, emptyPlayer, emptyPlayer], scoresList);
   });
 
-  it('returns complete information for highest scores', async () => {
+  it('returns complete information for highest scores in correct order', async () => {
     // Configure Players
-    const playerName0 = {
-      name: 'sir hiss',
-      address: accounts[0],
+    const playerInfo0 = {
+      name: 'sir_hiss',
+      address: account1,
       score: [123, 1230, 12300],
     };
-
-    const playerName1 = {
+    const playerInfo1 = {
       name: 'kaa',
-      address: accounts[1],
+      address: account2,
       score: [4560, 12],
     };
 
     //Register player names
-    await contract.methods
-      .setName(playerName0.address, playerName0.name)
-      .send({ from: playerName0.address, gas: '1000000' });
+    await DappSnakeInstance.methods
+      .setName(playerInfo0.address, encode(playerInfo0.name))
+      .send({ from: playerInfo0.address, gas });
 
-    await contract.methods
-      .setName(playerName1.address, playerName1.name)
-      .send({ from: playerName1.address, gas: '1000000' });
+    await DappSnakeInstance.methods
+      .setName(playerInfo1.address, encode(playerInfo1.name))
+      .send({ from: playerInfo1.address, gas });
 
     //Set each player's high score
-    await contract.methods
-      .setScore(playerName0.address, playerName0.score[0])
-      .send({ from: playerName0.address, gas: '1000000' });
+    // [123,0,0]
+    await DappSnakeInstance.methods
+      .setScore(playerInfo0.address, playerInfo0.score[0])
+      .send({ from: playerInfo0.address, gas });
 
-    await contract.methods
-      .setScore(playerName1.address, playerName1.score[0])
-      .send({ from: playerName1.address, gas: '1000000' });
+    // [4560, 123, 0]
+    await DappSnakeInstance.methods
+      .setScore(playerInfo1.address, playerInfo1.score[0])
+      .send({ from: playerInfo1.address, gas });
 
-    await contract.methods
-      .setScore(playerName0.address, playerName0.score[1])
-      .send({ from: playerName0.address, gas: '1000000' });
+    // [4560, 1230, 123]
+    await DappSnakeInstance.methods
+      .setScore(playerInfo0.address, playerInfo0.score[1])
+      .send({ from: playerInfo0.address, gas });
 
-    await contract.methods
-      .setScore(playerName0.address, playerName0.score[2])
-      .send({ from: playerName0.address, gas: '1000000' });
+    // [12300, 4560, 1230]
+    await DappSnakeInstance.methods
+      .setScore(playerInfo0.address, playerInfo0.score[2])
+      .send({ from: playerInfo0.address, gas });
 
-    await contract.methods
-      .setScore(playerName1.address, playerName1.score[1])
-      .send({ from: playerName1.address, gas: '1000000' });
+    // [12300, 4560, 1230]
+    await DappSnakeInstance.methods
+      .setScore(playerInfo1.address, playerInfo1.score[1])
+      .send({ from: playerInfo1.address, gas });
 
     //Get scores
-    const scores = await contract.methods.scores().call();
-
+    const scoresList = await getScoresList(DappSnakeInstance);
     const expectedScores = [
-      playerName0.score[0],
-      playerName1.score[0],
-      playerName0.score[1],
-      playerName0.score[2],
-      playerName1.score[1],
-    ];
-    assert.deepEqual(expectedScores, scores);
-
-    // Sort scores highest first
-    const tokenizedScores = scores.map((score, index) => {
-      return {
-        index,
-        score,
-      };
-    });
-
-    const sortedScores = tokenizedScores.sort((a, b) => b.score - a.score);
-
-    // Get additional info for highest three scores only
-    const score0 = await contract.methods.scoresComplete(sortedScores[0].index).call();
-    const score1 = await contract.methods.scoresComplete(sortedScores[1].index).call();
-    const score2 = await contract.methods.scoresComplete(sortedScores[2].index).call();
-
-    const highScores = [
       {
-        name: score0.name,
-        address: score0.playerAddress,
-        score: score0.score,
+        name: 'sir_hiss',
+        address: account1,
+        score: '12300',
       },
       {
-        name: score1.name,
-        address: score1.playerAddress,
-        score: score1.score,
+        name: 'kaa',
+        address: account2,
+        score: '4560',
       },
       {
-        name: score2.name,
-        address: score2.playerAddress,
-        score: score2.score,
+        name: 'sir_hiss',
+        address: account1,
+        score: '1230',
       },
     ];
 
-    const expectedHighScores = [
-      {
-        name: playerName0.name,
-        address: playerName0.address,
-        score: playerName0.score[2],
-      },
-      {
-        name: playerName1.name,
-        address: playerName1.address,
-        score: playerName1.score[0],
-      },
-      {
-        name: playerName0.name,
-        address: playerName0.address,
-        score: playerName0.score[1],
-      },
-    ];
-
-    assert.deepEqual(expectedHighScores, highScores);
+    assert.deepEqual(expectedScores, scoresList);
   });
 });
